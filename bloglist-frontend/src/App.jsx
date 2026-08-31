@@ -93,9 +93,7 @@ const App = () => {
 
   const blogFormRef = useRef()
 
-  const handleAddBlog = async (event) => {
-    event.preventDefault()
-
+  const createBlog = async (newBlog) => {
     try {
       const createdBlog = await blogService.create({
         title: newBlog.title,
@@ -105,11 +103,6 @@ const App = () => {
 
       const allBlogs = await blogService.getAll()
       setBlogs(allBlogs)
-      setNewBlog({
-        title: '',
-        author: '',
-        url: '',
-      })
 
       const blogTitle = createdBlog.title || newBlog.title
       const blogAuthor = createdBlog.author || newBlog.author
@@ -163,9 +156,7 @@ const App = () => {
 
       <Togglable buttonLabel='create new blog' ref={blogFormRef}>
         <AddBlogForm
-          newBlog={newBlog}
-          setNewBlog={setNewBlog}
-          handleAddBlog={handleAddBlog}
+          createBlog={createBlog}
         />
       </Togglable>
 
