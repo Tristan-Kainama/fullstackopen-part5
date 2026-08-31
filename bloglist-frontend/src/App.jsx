@@ -125,6 +125,27 @@ const App = () => {
     }
   }
 
+  const updateBlog = async (newBlog, blogId) => {
+    try {
+      const updatedBlog = await blogService.update({
+        title: newBlog.title,
+        author: newBlog.author,
+        url: newBlog.url,
+        likes: newBlog.likes
+      }, blogId)
+
+      const allBlogs = await blogService.getAll()
+      setBlogs(allBlogs)
+    } catch {
+      setMessage('failed to update blog')
+      setIsError(true)
+
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+    }
+  }
+
   if (user === null) {
     return (
       <div>
@@ -172,7 +193,7 @@ const App = () => {
           )
         })
         .map((blog) => (
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} updateBlog={updateBlog}/>
         ))}
     </div>
   )
