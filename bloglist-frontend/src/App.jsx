@@ -99,6 +99,7 @@ const App = () => {
         title: newBlog.title,
         author: newBlog.author,
         url: newBlog.url,
+        likes: 0
       })
 
       const allBlogs = await blogService.getAll()
