@@ -163,6 +163,18 @@ const App = () => {
     )
   }
 
+  const visibleBlogs = [...blogs]
+    .filter((blog) => {
+      const blogUser = blog.user
+
+      return (
+        blogUser?.username === user.username ||
+        blogUser?.id === user.id ||
+        blogUser === user.id
+      )
+    })
+    .sort((a, b) => b.likes - a.likes)
+
   return (
     <div>
       <h2>blogs</h2>
@@ -182,19 +194,9 @@ const App = () => {
         />
       </Togglable>
 
-      {blogs
-        .filter((blog) => {
-          const blogUser = blog.user
-
-          return (
-            blogUser?.username === user.username ||
-            blogUser?.id === user.id ||
-            blogUser === user.id
-          )
-        })
-        .map((blog) => (
-          <Blog key={blog.id} blog={blog} updateBlog={updateBlog}/>
-        ))}
+      {visibleBlogs.map((blog) => (
+        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+      ))}
     </div>
   )
 }
