@@ -17,12 +17,6 @@ const App = () => {
   const [message, setMessage] = useState(null)
   const [isError, setIsError] = useState(false)
 
-  const [newBlog, setNewBlog] = useState({
-    title: '',
-    author: '',
-    url: '',
-  })
-
   useEffect(() => {
     if (!user) {
       return
@@ -146,6 +140,29 @@ const App = () => {
     }
   }
 
+  const removeBlog = async (blogId) => {
+    try {
+      const blogToDelete = await blogService.getBlog(blogId)
+      const deletedBlog = await blogService.remove(blogId)
+
+      const allBlogs = await blogService.getAll()
+      setBlogs(allBlogs)
+
+      setMessage(`${blogToDelete.title} by ${blogToDelete.author} blog has been sucessfully removed`)
+
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+    } catch {
+      setMessage('failed to delete blog')
+      setIsError(true)
+
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+    }
+  }
+
   if (user === null) {
     return (
       <div>
@@ -195,7 +212,7 @@ const App = () => {
       </Togglable>
 
       {visibleBlogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} removeBlog={removeBlog}/>
       ))}
     </div>
   )
