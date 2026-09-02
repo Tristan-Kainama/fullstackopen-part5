@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Blog from '../Blog'
-import { expect } from 'vitest'
+import { describe, expect, vi } from 'vitest'
 
-describe('<Blog />', () => {
+describe('<Blog /> rendering', () => {
     beforeEach(() => {
         const blog = {
             title: 'great blog',
@@ -39,5 +39,32 @@ describe('<Blog />', () => {
 
         const likes = screen.getByText('10', {exact: false})
         expect(likes).toBeVisible()
+    })
+})
+
+describe('<Blog /> buttons', () => {
+    test('if like button is clicked twice, receive props twice', async () =>{
+        const blog = {
+            title: 'great blog',
+            author: 'Tristan Kainama',
+            url: 'http://yesman.com',
+            likes: 10,
+            user: {
+                username: 'tristank',
+                name: 'Tristan K.'
+            }
+        }
+
+        const mockHandler = vi.fn()
+
+        render(<Blog blog={blog} updateBlog={mockHandler}/>)
+
+        const user = userEvent.setup()
+        const button = screen.getByText('like')
+        
+        await user.click(button)
+        await user.click(button)
+
+        expect(mockHandler.mock.calls).toHaveLength(2)
     })
 })
