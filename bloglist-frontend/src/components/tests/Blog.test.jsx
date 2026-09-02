@@ -34,7 +34,10 @@ describe('<Blog />', () => {
         const button = screen.getByText('view')
         await user.click(button)
 
-        const element = screen.getByText('http://yesman.com')
-        expect(element).toBeVisible()
+        const url = screen.getByText('http://yesman.com')
+        expect(url).toBeVisible()
+
+        const likes = screen.getByText('10', {exact: false})
+        expect(likes).toBeVisible()
     })
 })
