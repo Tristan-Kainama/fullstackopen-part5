@@ -1,5 +1,5 @@
 const Notification = ({ message, isError }) => {
-  if (message == null) {
+  if (message === null) {
     return null
   }
 

@@ -77,7 +77,7 @@ const App = () => {
     setUser(null)
     setUsername('')
     setPassword('')
-    
+
     setMessage('succesfully logged out')
     setIsError(false)
     setTimeout(() => {
@@ -121,7 +121,7 @@ const App = () => {
 
   const updateBlog = async (newBlog, blogId) => {
     try {
-      const updatedBlog = await blogService.update({
+      await blogService.update({
         title: newBlog.title,
         author: newBlog.author,
         url: newBlog.url,
@@ -143,7 +143,7 @@ const App = () => {
   const removeBlog = async (blogId) => {
     try {
       const blogToDelete = await blogService.getBlog(blogId)
-      const deletedBlog = await blogService.remove(blogId)
+      await blogService.remove(blogId)
 
       const allBlogs = await blogService.getAll()
       setBlogs(allBlogs)

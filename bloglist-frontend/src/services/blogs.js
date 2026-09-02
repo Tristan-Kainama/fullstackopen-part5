@@ -37,7 +37,7 @@ const update = async (credentials, id) => {
 
 const remove = async (id) => {
   const config = {
-    headers: {Authorization: token }
+    headers: { Authorization: token }
   }
 
   const blogUrl = baseUrl + '/' + id
