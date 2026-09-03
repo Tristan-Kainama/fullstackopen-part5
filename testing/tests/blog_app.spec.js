@@ -49,13 +49,26 @@ describe('Blog app', () => {
     describe('Logged in with one blog in it', () => {
         beforeEach(async ({ page }) => {
             addBlog(page, 'cool blog', 'Tristan Kainama', 'http://yesman.com')
+            await page.getByRole('button', { name: 'view' }).click()
         })
 
         test('a blog can be liked', async ({ page }) => {
-            await page.getByRole('button', { name: 'view' }).click()
             await page.getByRole('button', { name: 'like' }).click()
 
             await expect(page.getByText('likes 1')).toBeVisible()
+        })
+
+        test('a blog can be deleted', async ({ page }) => {
+            page.on('dialog', async dialog => {
+                await dialog.accept()
+            })
+
+            await page.getByRole('button', { name: 'remove' }).click()
+
+            const notifDiv = page.locator('.notification')
+            await expect(notifDiv).toContainText('cool blog by Tristan Kainama blog has been sucessfully removed')
+
+            await expect(page.getByText('cool blog', { exact: false })).not.toBeVisible()
         })
     })
   })
