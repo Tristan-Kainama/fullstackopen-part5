@@ -1,4 +1,5 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
+const { loginWith, addBlog }  = require('./helper')
 
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
@@ -21,18 +22,41 @@ describe('Blog app', () => {
 
   describe('Login', () => {
     test('succeeeds with correct credentials', async ({ page }) => {
-        await page.getByLabel('username').fill('tristank')
-        await page.getByLabel('password').fill('secret123')
-        await page.getByRole('button', { name: 'login' }).click()
+        await loginWith(page, 'tristank', 'secret123')
 
         await expect(page.getByText('Tristan Kainama logged in')).toBeVisible()
     })
     test('fails with wrong credentials', async ({ page }) => {
-        await page.getByLabel('username').fill('something')
-        await page.getByLabel('password').fill('something')
-        await page.getByRole('button', { name: 'login' }).click()
+        await loginWith(page, 'tristankai', 'abangabangan')
 
-        await expect(page.getByText('Log in to application')).toBeVisible()
+        const notifDiv = page.locator('.notification')
+        await expect(notifDiv).toContainText('wrong credentials')
+    })
+  })
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+        await loginWith(page, 'tristank', 'secret123')
+    })
+
+    test('a new blog can be created', async ({ page }) => {
+        addBlog(page, 'cool blog', 'Tristan Kainama', 'http://yesman.com')
+
+        const notifDiv = page.locator('.notification')
+        await expect(notifDiv).toContainText('a new blog cool blog by Tristan Kainama added')
+    })
+
+    describe('Logged in with one blog in it', () => {
+        beforeEach(async ({ page }) => {
+            addBlog(page, 'cool blog', 'Tristan Kainama', 'http://yesman.com')
+        })
+
+        test('a blog can be liked', async ({ page }) => {
+            await page.getByRole('button', { name: 'view' }).click()
+            await page.getByRole('button', { name: 'like' }).click()
+
+            await expect(page.getByText('likes 1')).toBeVisible()
+        })
     })
   })
 })
