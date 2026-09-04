@@ -1,5 +1,5 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
-const { loginWith, addBlog }  = require('./helper')
+const { loginWith, addBlog, getBlogId }  = require('./helper')
 
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
@@ -40,7 +40,7 @@ describe('Blog app', () => {
     })
 
     test('a new blog can be created', async ({ page }) => {
-        addBlog(page, 'cool blog', 'Tristan Kainama', 'http://yesman.com')
+        await addBlog(page, 'cool blog', 'Tristan Kainama', 'http://yesman.com')
 
         const notifDiv = page.locator('.notification')
         await expect(notifDiv).toContainText('a new blog cool blog by Tristan Kainama added')
@@ -48,7 +48,7 @@ describe('Blog app', () => {
 
     describe('Logged in with one blog in it', () => {
         beforeEach(async ({ page }) => {
-            addBlog(page, 'cool blog', 'Tristan Kainama', 'http://yesman.com')
+            await addBlog(page, 'cool blog', 'Tristan Kainama', 'http://yesman.com')
             await page.getByRole('button', { name: 'view' }).click()
         })
 
@@ -69,6 +69,30 @@ describe('Blog app', () => {
             await expect(notifDiv).toContainText('cool blog by Tristan Kainama blog has been sucessfully removed')
 
             await expect(page.getByText('cool blog', { exact: false })).not.toBeVisible()
+        })
+    })
+
+    describe('Logged in with many blogs in it', () => {
+        beforeEach(async ({ page }) => {
+            await addBlog(page, 'cool blog', 'Tristan Kainama', 'http://yesman.com')
+            await addBlog(page, 'blog about animals', 'Davidson Paul', 'http://conspicuous.com')
+            await addBlog(page, 'What are those?', 'Davidson Paul', 'http://daddle.com')
+        })
+
+        test("only the user who added the blog sees the blog's delete button", async ({ page }) => {
+            const locator1 = page.locator(`[id="${await getBlogId('cool blog')}"]`)
+            const locator2 = page.locator(`[id="${await getBlogId('blog about animals')}"]`)
+            const locator3 = page.locator(`[id="${await getBlogId('What are those?')}"]`)
+
+            const reviewBlog = async (loc) => {
+                await loc.getByRole('button', { name: 'view' }).click()
+                await expect(loc.getByText('Tristan Kainama', { exact: true })).toBeVisible()
+                await expect(loc.getByRole('button', { name: 'remove' })).toBeVisible()
+            }
+
+            await reviewBlog(locator1)
+            await reviewBlog(locator2)
+            await reviewBlog(locator3)
         })
     })
   })

@@ -12,4 +12,11 @@ const addBlog = async (page, title, author, url) => {
     await page.getByRole('button', { name: 'create' }).click()
 }
 
-export { loginWith, addBlog }
+const getBlogId = async (title) => {
+    const response = await fetch('http://localhost:3001/api/blogs')
+    const blogs = await response.json()
+    const blog = blogs.find(blog => blog.title === title)
+    return blog.id
+}
+
+export { loginWith, addBlog, getBlogId }
