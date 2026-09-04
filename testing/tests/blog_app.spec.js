@@ -94,6 +94,46 @@ describe('Blog app', () => {
             await reviewBlog(locator2)
             await reviewBlog(locator3)
         })
+
+        test('blogs are ordered by likes, most liked first', async ({ page }) => {
+            const blogIds = {
+                cool: await getBlogId('cool blog'),
+                animals: await getBlogId('blog about animals'),
+                those: await getBlogId('What are those?')
+            }
+
+            const likeBlog = async (id, likeCount) => {
+                const blog = page.locator(`[id="${id}"]`)
+                await blog.getByRole('button', { name: 'view' }).click()
+
+                for (let index = 0; index < likeCount; index++) {
+                    if (index > 0) {
+                        await page.waitForTimeout(2000)
+                    }
+                    await blog.getByRole('button', { name: 'like' }).click()
+                }
+
+                await expect(blog.getByText(`likes ${likeCount}`, { exact: false })).toBeVisible()
+            }
+
+            await likeBlog(blogIds.cool, 1)
+            await likeBlog(blogIds.animals, 3)
+            await likeBlog(blogIds.those, 2)
+
+                await expect(page.locator(`[id="${blogIds.animals}"]`)).toBeVisible()
+
+                const orderedBlogIds = await page.locator('[id]').evaluateAll((elements, ids) =>
+                elements
+                    .filter(element => ids.includes(element.id))
+                    .map(element => element.id)
+                , Object.values(blogIds))
+
+            expect(orderedBlogIds).toEqual([
+                blogIds.animals,
+                blogIds.those,
+                blogIds.cool
+            ])
+        })
     })
   })
 })
