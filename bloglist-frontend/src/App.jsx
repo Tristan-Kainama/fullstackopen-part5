@@ -1,10 +1,17 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import AddBlogForm from './components/AddBlogForm'
 import LoginForm from './components/LoginForm'
 import Togglable from './components/Togglable'
+import BlogList from './components/BlogList'
+
+import {
+  BrowserRouter as Router,
+  Routes, Route, Link
+} from 'react-router-dom'
 
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -18,12 +25,8 @@ const App = () => {
   const [isError, setIsError] = useState(false)
 
   useEffect(() => {
-    if (!user) {
-      return
-    }
-
     blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [user])
+  }, [])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -59,6 +62,7 @@ const App = () => {
       setTimeout(() => {
         setMessage(null)
       }, 5000)
+      return true
     } catch {
       setMessage('wrong credentials')
       setIsError(true)
@@ -66,6 +70,7 @@ const App = () => {
       setTimeout(() => {
         setMessage(null)
       }, 5000)
+      return false
     }
   }
 
@@ -163,58 +168,48 @@ const App = () => {
     }
   }
 
-  if (user === null) {
-    return (
-      <div>
-        <h2>Log in to application</h2>
-        <Notification message={message} isError={isError} />
+  // const visibleBlogs = [...blogs]
+  //   .filter((blog) => {
+  //     const blogUser = blog.user
 
-        <LoginForm
+  //     return (
+  //       blogUser?.username === user.username ||
+  //       blogUser?.id === user.id ||
+  //       blogUser === user.id
+  //     )
+  //   })
+  //   .sort((a, b) => b.likes - a.likes)
+
+  return (
+    <Router>
+      <div>
+        <Link to='/'>blogs</Link>
+        {user ?  <button onClick={handleLogout}>logout</button> : <Link to='/login'>login</Link>}
+      </div>
+
+      <Notification message={message} isError={isError} />
+
+      <Routes>
+        <Route path='/' element={
+          <BlogList blogs={blogs} updateBlog={updateBlog} removeBlog={removeBlog} message={message} isError={isError}/>
+        }/>
+        <Route path='/login' element={
+          <LoginForm 
           handleLogin={handleLogin}
           username={username}
           password={password}
           setUsername={setUsername}
-          setPassword={setPassword}
-        />
-      </div>
-    )
-  }
+          setPassword={setPassword}/>
+        }/>
+      </Routes>
 
-  const visibleBlogs = [...blogs]
-    .filter((blog) => {
-      const blogUser = blog.user
-
-      return (
-        blogUser?.username === user.username ||
-        blogUser?.id === user.id ||
-        blogUser === user.id
-      )
-    })
-    .sort((a, b) => b.likes - a.likes)
-
-  return (
-    <div>
-      <h2>blogs</h2>
-
-      <Notification message={message} isError={isError} />
-
-      <p>
-        {user.name} logged in{' '}
-        <button onClick={handleLogout}>logout</button>
-      </p>
-
-      <h2>Add New</h2>
-
-      <Togglable buttonLabel='create new blog' ref={blogFormRef}>
-        <AddBlogForm
-          createBlog={createBlog}
-        />
-      </Togglable>
-
-      {visibleBlogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} removeBlog={removeBlog}/>
-      ))}
-    </div>
+      {/* {user && <>
+        <h2>Add New</h2>
+        <Togglable buttonLabel='create new blog' ref={blogFormRef}>
+          <AddBlogForm createBlog={createBlog} />
+        </Togglable>
+      </>} */}
+    </Router>
   )
 }
 

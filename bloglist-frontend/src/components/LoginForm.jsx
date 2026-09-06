@@ -1,6 +1,20 @@
-const LoginForm = ({ handleLogin, username, password, setUsername, setPassword }) => (
-  <div>
-    <form onSubmit={handleLogin}>
+import { useNavigate } from 'react-router-dom'
+
+const LoginForm = ({ handleLogin, username, password, setUsername, setPassword }) => {
+  const navigate = useNavigate()
+
+  const submitLogin = async (event) => {
+    const loginSucceeded = await handleLogin(event)
+
+    if (loginSucceeded) {
+      navigate('/')
+    }
+  }
+
+  return (
+    <div>
+      <h2>Log in to application</h2>
+      <form onSubmit={submitLogin}>
       <div>
         <label>
           username
@@ -24,8 +38,9 @@ const LoginForm = ({ handleLogin, username, password, setUsername, setPassword }
       </div>
 
       <button type="submit">login</button>
-    </form>
-  </div>
-)
+      </form>
+    </div>
+  )
+}
 
 export default LoginForm
