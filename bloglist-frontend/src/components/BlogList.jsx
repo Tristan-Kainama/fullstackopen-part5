@@ -1,13 +1,16 @@
-import Blog from './Blog'
-import Notification from './Notification'
+import { Link } from 'react-router-dom'
 
-const BlogList = ({ blogs, updateBlog, removeBlog, message, isError}) => {
+const BlogList = ({ blogs }) => {
     return (
         <div>
             <h2>blogs</h2>
+            <ul>
             {blogs.map((blog) => (
-                <Blog key={blog.id} blog={blog} updateBlog={updateBlog} removeBlog={removeBlog}/>
+                <li key={blog.id}>
+                    <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+                </li>
             ))}
+            </ul>
         </div>
     )
 }

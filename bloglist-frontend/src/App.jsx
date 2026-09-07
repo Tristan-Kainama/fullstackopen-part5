@@ -125,6 +125,16 @@ const App = () => {
   }
 
   const updateBlog = async (newBlog, blogId) => {
+    if (user === null) {
+      setMessage('user has to be logged in')
+      setIsError(true)
+
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+      return 
+    }
+
     try {
       await blogService.update({
         title: newBlog.title,
@@ -168,6 +178,10 @@ const App = () => {
     }
   }
 
+  const padding = {
+    padding: 5
+  }
+
   // const visibleBlogs = [...blogs]
   //   .filter((blog) => {
   //     const blogUser = blog.user
@@ -183,15 +197,18 @@ const App = () => {
   return (
     <Router>
       <div>
-        <Link to='/'>blogs</Link>
-        {user ?  <button onClick={handleLogout}>logout</button> : <Link to='/login'>login</Link>}
+        <Link to='/' style={padding}>blogs</Link>
+        {user ?  <button style={padding} onClick={handleLogout}>logout</button> : <Link to='/login' style={padding}>login</Link>}
       </div>
 
       <Notification message={message} isError={isError} />
 
       <Routes>
+        <Route path='/blogs/:id' element={
+          <Blog blogs={blogs} user={user} updateBlog={updateBlog} removeBlog={removeBlog}/>
+        }/>
         <Route path='/' element={
-          <BlogList blogs={blogs} updateBlog={updateBlog} removeBlog={removeBlog} message={message} isError={isError}/>
+          <BlogList blogs={blogs}/>
         }/>
         <Route path='/login' element={
           <LoginForm 

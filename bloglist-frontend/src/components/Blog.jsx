@@ -1,19 +1,16 @@
 import { useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
-const Blog = ({ blog, updateBlog, removeBlog }) => {
+const Blog = ({ blogs, user, updateBlog, removeBlog }) => {
   const [visible, setVisible] = useState(false)
+  const navigate = useNavigate()
+
+  const id = useParams().id
+  const blog = blogs.find(blog => blog.id === id)
 
   const showWhenVisible = { display: visible ? '' : 'none' }
   const buttonLabel = visible ? 'hide' : 'view'
-
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-    fontSize: 14
-  }
 
   const setVisibility = (event) => {
     event.preventDefault()
@@ -22,6 +19,10 @@ const Blog = ({ blog, updateBlog, removeBlog }) => {
 
   const handleLike = (event) => {
     event.preventDefault()
+
+    if (!user) {
+      navigate('/login')
+    }
 
     updateBlog({
       title: blog.title,
@@ -40,16 +41,12 @@ const Blog = ({ blog, updateBlog, removeBlog }) => {
   }
 
   return (
-    <div style={blogStyle} id={blog.id}>
-      <div>
-        {blog.title} {blog.author} <button onClick={setVisibility}>{buttonLabel}</button>
-      </div>
-      <div style={showWhenVisible} className='otherInformation'>
-        <p>{blog.url}</p>
-        <p>likes {blog.likes}</p> <button onClick={handleLike}>like</button>
-        {blog.user?.name && <p>{blog.user.name}</p>}
-        <button onClick={handleRemove}>remove</button>
-      </div>
+    <div id={blog.id}>
+      <h2>{blog.title}</h2>
+      <p>{blog.url}</p>
+      <p>likes {blog.likes}</p> <button onClick={handleLike}>like</button>
+      <p>Added By {blog.user.name}</p>
+      <button onClick={handleRemove}>remove</button>
     </div>
   )
 }
