@@ -90,8 +90,6 @@ const App = () => {
     }, 5000)
   }
 
-  const blogFormRef = useRef()
-
   const createBlog = async (newBlog) => {
     try {
       const createdBlog = await blogService.create({
@@ -107,7 +105,6 @@ const App = () => {
       const blogTitle = createdBlog.title || newBlog.title
       const blogAuthor = createdBlog.author || newBlog.author
 
-      blogFormRef.current.toggleVisibility()
       setMessage(`a new blog ${blogTitle} by ${blogAuthor} added`)
       setIsError(false)
 
@@ -156,6 +153,16 @@ const App = () => {
   }
 
   const removeBlog = async (blogId) => {
+    if (user === null) {
+      setMessage('user has to be logged in')
+      setIsError(true)
+
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+      return 
+    }
+    
     try {
       const blogToDelete = await blogService.getBlog(blogId)
       await blogService.remove(blogId)
@@ -164,6 +171,7 @@ const App = () => {
       setBlogs(allBlogs)
 
       setMessage(`${blogToDelete.title} by ${blogToDelete.author} blog has been sucessfully removed`)
+      setIsError(false)
 
       setTimeout(() => {
         setMessage(null)
@@ -198,6 +206,7 @@ const App = () => {
     <Router>
       <div>
         <Link to='/' style={padding}>blogs</Link>
+        {user ? <Link to='create' style={padding}>new blog</Link> : null}
         {user ?  <button style={padding} onClick={handleLogout}>logout</button> : <Link to='/login' style={padding}>login</Link>}
       </div>
 
@@ -218,14 +227,11 @@ const App = () => {
           setUsername={setUsername}
           setPassword={setPassword}/>
         }/>
+        <Route path='/create' element={
+          <AddBlogForm createBlog={createBlog}/>
+        }/>
       </Routes>
 
-      {/* {user && <>
-        <h2>Add New</h2>
-        <Togglable buttonLabel='create new blog' ref={blogFormRef}>
-          <AddBlogForm createBlog={createBlog} />
-        </Togglable>
-      </>} */}
     </Router>
   )
 }

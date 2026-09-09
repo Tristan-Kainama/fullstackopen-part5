@@ -36,7 +36,12 @@ const Blog = ({ blogs, user, updateBlog, removeBlog }) => {
     event.preventDefault()
 
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)){
+      if (!user) {
+        navigate('/login')
+      }
+      
       removeBlog(blog.id)
+      navigate('/')
     }
   }
 
