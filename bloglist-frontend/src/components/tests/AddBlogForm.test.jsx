@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import AddBlogForm from '../AddBlogForm'
 import { describe, expect, test, vi } from 'vitest'
 
@@ -8,7 +9,11 @@ describe('<AddBlogForm />', () => {
         const createBlog = vi.fn()
         const user = userEvent.setup()
 
-        const { container } = render(<AddBlogForm createBlog={createBlog} />)
+        const { container } = render(
+            <MemoryRouter>
+                <AddBlogForm createBlog={createBlog} />
+            </MemoryRouter>
+        )
 
         const titleInput = container.querySelector('#title')
         const authorInput = container.querySelector('#author')
@@ -20,7 +25,7 @@ describe('<AddBlogForm />', () => {
 
         const createButton = screen.getByText('create')
         await user.click(createButton)
-        
+
         expect(createBlog.mock.calls).toHaveLength(1)
         expect(createBlog.mock.calls[0][0].title).toBe('cool blog')
         expect(createBlog.mock.calls[0][0].author).toBe('Tristan Kainama')

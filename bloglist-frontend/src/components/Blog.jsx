@@ -1,27 +1,19 @@
-import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 
-const Blog = ({ blogs, user, updateBlog, removeBlog }) => {
-  const [visible, setVisible] = useState(false)
+const Blog = ({ blogs, users, user, updateBlog, removeBlog }) => {
   const navigate = useNavigate()
+  const curUser = user ? users.find(thisUser => thisUser.username === user.username) : null
 
   const id = useParams().id
   const blog = blogs.find(blog => blog.id === id)
-
-  const showWhenVisible = { display: visible ? '' : 'none' }
-  const buttonLabel = visible ? 'hide' : 'view'
-
-  const setVisibility = (event) => {
-    event.preventDefault()
-    setVisible((previousVisible) => !previousVisible)
-  }
 
   const handleLike = (event) => {
     event.preventDefault()
 
     if (!user) {
       navigate('/login')
+      return
     }
 
     updateBlog({
@@ -35,23 +27,27 @@ const Blog = ({ blogs, user, updateBlog, removeBlog }) => {
   const handleRemove = (event) => {
     event.preventDefault()
 
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)){
-      if (!user) {
-        navigate('/login')
-      }
-      
+    if (!user) {
+      navigate('/login')
+      return
+    }
+
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
       removeBlog(blog.id)
       navigate('/')
     }
   }
 
+  const isOwner = curUser && curUser.id === blog.user.id
+
   return (
     <div id={blog.id}>
       <h2>{blog.title}</h2>
       <p>{blog.url}</p>
-      <p>likes {blog.likes}</p> <button onClick={handleLike}>like</button>
+      <p>likes {blog.likes}</p>
+      {user ? <button onClick={handleLike}>like</button> : null}
       <p>Added By {blog.user.name}</p>
-      <button onClick={handleRemove}>remove</button>
+      {isOwner ? <button onClick={handleRemove}>remove</button> : null}
     </div>
   )
 }

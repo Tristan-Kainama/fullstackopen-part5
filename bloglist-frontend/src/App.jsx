@@ -14,10 +14,12 @@ import {
 } from 'react-router-dom'
 
 import blogService from './services/blogs'
+import userService from './services/users'
 import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
+  const [users, setUsers] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -27,6 +29,10 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
   }, [])
+
+  useEffect(() => {
+    userService.getAll().then((users) => setUsers(users))
+  })
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -214,7 +220,7 @@ const App = () => {
 
       <Routes>
         <Route path='/blogs/:id' element={
-          <Blog blogs={blogs} user={user} updateBlog={updateBlog} removeBlog={removeBlog}/>
+          <Blog blogs={blogs} users={users} user={user} updateBlog={updateBlog} removeBlog={removeBlog}/>
         }/>
         <Route path='/' element={
           <BlogList blogs={blogs}/>

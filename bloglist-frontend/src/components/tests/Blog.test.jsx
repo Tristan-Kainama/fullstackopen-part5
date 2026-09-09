@@ -1,70 +1,80 @@
-import { render, screen } from '@testing-library/react'
+﻿import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import Blog from '../Blog'
 import { describe, expect, vi } from 'vitest'
 
-describe('<Blog /> rendering', () => {
-    beforeEach(() => {
-        const blog = {
-            title: 'great blog',
-            author: 'Tristan Kainama',
-            url: 'http://yesman.com',
-            likes: 10,
-            user: {
-                username: 'tristank',
-                name: 'Tristan K.'
-            }
-        }
+const blog = {
+  id: '1',
+  title: 'great blog',
+  author: 'Tristan Kainama',
+  url: 'http://yesman.com',
+  likes: 10,
+  user: {
+    id: 'u1',
+    username: 'tristank',
+    name: 'Tristan K.'
+  }
+}
 
-        render(<Blog blog={blog}/>)
-    })
+const creator = {
+  id: 'u1',
+  username: 'tristank',
+  name: 'Tristan K.'
+}
 
-    test('renders title and author', () => {
-        screen.getByText('great blog', {exact: false})
-        screen.getByText('Tristan Kainama', {exact: false})
-    })
+const viewer = {
+  id: 'u2',
+  username: 'otheruser',
+  name: 'Other User'
+}
 
-    test('at start the other information are not displayed', () => {
-        const element = screen.getByText('http://yesman.com')
-        expect(element).not.toBeVisible()
-    })
+const users = [creator, viewer]
 
-    test('after view button is clicked, other information are displayed', async () => {
-        const user = userEvent.setup()
-        const button = screen.getByText('view')
-        await user.click(button)
+const renderBlog = (currentUser = null, updateBlog = vi.fn(), removeBlog = vi.fn()) => {
+  render(
+    <MemoryRouter initialEntries={['/blogs/1']}>
+      <Routes>
+        <Route
+          path='/blogs/:id'
+          element={
+            <Blog
+              blogs={[blog]}
+              users={users}
+              user={currentUser}
+              updateBlog={updateBlog}
+              removeBlog={removeBlog}
+            />
+          }
+        />
+      </Routes>
+    </MemoryRouter>
+  )
+}
 
-        const url = screen.getByText('http://yesman.com')
-        expect(url).toBeVisible()
+describe('<Blog /> single view', () => {
+  test('shows blog information and likes for unauthenticated users without buttons', () => {
+    renderBlog(null)
 
-        const likes = screen.getByText('10', {exact: false})
-        expect(likes).toBeVisible()
-    })
-})
+    expect(screen.getByRole('heading', { name: 'great blog' })).toBeInTheDocument()
+    expect(screen.getByText('http://yesman.com')).toBeVisible()
+    expect(screen.getByText('likes 10')).toBeVisible()
+    expect(screen.getByText('Added By Tristan K.')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'like' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'remove' })).not.toBeInTheDocument()
+  })
 
-describe('<Blog /> buttons', () => {
-    test('if like button is clicked twice, receive props twice', async () =>{
-        const blog = {
-            title: 'great blog',
-            author: 'Tristan Kainama',
-            url: 'http://yesman.com',
-            likes: 10,
-            user: {
-                username: 'tristank',
-                name: 'Tristan K.'
-            }
-        }
+  test('shows only the like button for authenticated users who are not the creator', () => {
+    renderBlog(viewer)
 
-        const mockHandler = vi.fn()
+    expect(screen.getByRole('button', { name: 'like' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'remove' })).not.toBeInTheDocument()
+  })
 
-        render(<Blog blog={blog} updateBlog={mockHandler}/>)
+  test('shows the delete button for the blog creator in addition to the like button', () => {
+    renderBlog(creator)
 
-        const user = userEvent.setup()
-        const button = screen.getByText('like')
-        
-        await user.click(button)
-        await user.click(button)
-
-        expect(mockHandler.mock.calls).toHaveLength(2)
-    })
+    expect(screen.getByRole('button', { name: 'like' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'remove' })).toBeInTheDocument()
+  })
 })
