@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Container } from '@mui/material'
 
 import Blog from './components/Blog'
 import Notification from './components/Notification'
@@ -209,36 +210,38 @@ const App = () => {
   //   .sort((a, b) => b.likes - a.likes)
 
   return (
-    <Router>
-      <div>
-        <Link to='/' style={padding}>blogs</Link>
-        {user ? <Link to='create' style={padding}>new blog</Link> : null}
-        {user ?  <button style={padding} onClick={handleLogout}>logout</button> : <Link to='/login' style={padding}>login</Link>}
-      </div>
+    <Container>
+      <Router>
+        <div>
+          <Link to='/' style={padding}>blogs</Link>
+          {user ? <Link to='create' style={padding}>new blog</Link> : null}
+          {user ?  <button style={padding} onClick={handleLogout}>logout</button> : <Link to='/login' style={padding}>login</Link>}
+        </div>
 
-      <Notification message={message} isError={isError} />
+        <Notification message={message} isError={isError} />
 
-      <Routes>
-        <Route path='/blogs/:id' element={
-          <Blog blogs={blogs} users={users} user={user} updateBlog={updateBlog} removeBlog={removeBlog}/>
-        }/>
-        <Route path='/' element={
-          <BlogList blogs={blogs}/>
-        }/>
-        <Route path='/login' element={
-          <LoginForm 
-          handleLogin={handleLogin}
-          username={username}
-          password={password}
-          setUsername={setUsername}
-          setPassword={setPassword}/>
-        }/>
-        <Route path='/create' element={
-          <AddBlogForm createBlog={createBlog}/>
-        }/>
-      </Routes>
+        <Routes>
+          <Route path='/blogs/:id' element={
+            <Blog blogs={blogs} users={users} user={user} updateBlog={updateBlog} removeBlog={removeBlog}/>
+          }/>
+          <Route path='/' element={
+            <BlogList blogs={blogs}/>
+          }/>
+          <Route path='/login' element={
+            <LoginForm 
+            handleLogin={handleLogin}
+            username={username}
+            password={password}
+            setUsername={setUsername}
+            setPassword={setPassword}/>
+          }/>
+          <Route path='/create' element={
+            <AddBlogForm createBlog={createBlog}/>
+          }/>
+        </Routes>
 
-    </Router>
+      </Router>
+    </Container>
   )
 }
 

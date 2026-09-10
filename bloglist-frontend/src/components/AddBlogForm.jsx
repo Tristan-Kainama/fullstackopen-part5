@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { TextField, Button } from '@mui/material'
 
 const AddBlogForm = ({ createBlog }) => {
   const [newBlog, setNewBlog] = useState({
@@ -30,58 +31,52 @@ const AddBlogForm = ({ createBlog }) => {
     <div>
       <h2>create new</h2>
       <form onSubmit={addBlog}>
-        <label>
-          title:
-          <input
-            type="text"
-            name="title"
-            id="title"
-            value={newBlog.title}
-            onChange={({ target }) =>
-              setNewBlog((prev) => ({
-                ...prev,
-                [target.name]: target.value
-              }))
-            }
-          />
-        </label>
+        <TextField
+        label='title'
+        name='title'
+        id='title'
+        value={newBlog.title}
+        onChange={({ target }) =>
+            setNewBlog((prev) => ({
+              ...prev,
+              [target.name]: target.value
+            }))
+          }
+        style={{ marginTop: 10 }}/>
+        
+        <br />
+        
+        <TextField
+        label='author'
+        name='author'
+        id='author'
+        value={newBlog.author}
+        onChange={({ target }) =>
+            setNewBlog((prev) => ({
+              ...prev,
+              [target.name]: target.value
+            }))
+          }
+        style={{ marginTop: 10 }}/>
+
+        <br />
+        
+        <TextField
+        label='url'
+        name='url'
+        id='url'
+        value={newBlog.url}
+        onChange={({ target }) =>
+            setNewBlog((prev) => ({
+              ...prev,
+              [target.name]: target.value
+            }))
+          }
+        style={{ marginTop: 10 }}/>
+
         <br />
 
-        <label>
-          author:
-          <input
-            type="text"
-            name="author"
-            id="author"
-            value={newBlog.author}
-            onChange={({ target }) =>
-              setNewBlog((prev) => ({
-                ...prev,
-                [target.name]: target.value
-              }))
-            }
-          />
-        </label>
-        <br />
-
-        <label>
-          url:
-          <input
-            type="text"
-            name="url"
-            id="url"
-            value={newBlog.url}
-            onChange={({ target }) =>
-              setNewBlog((prev) => ({
-                ...prev,
-                [target.name]: target.value
-              }))
-            }
-          />
-        </label>
-        <br />
-
-        <button type="submit">create</button>
+        <Button type="submit" variant="contained" style={{ marginTop: 10 }}>create</Button>
       </form>
     </div>
   )
