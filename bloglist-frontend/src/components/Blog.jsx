@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
+import { Card, CardActions, CardContent, Typography, Button } from '@mui/material'
 
 const Blog = ({ blogs, users, user, updateBlog, removeBlog }) => {
   const navigate = useNavigate()
@@ -41,14 +42,29 @@ const Blog = ({ blogs, users, user, updateBlog, removeBlog }) => {
   const isOwner = curUser && curUser.id === blog.user.id
 
   return (
-    <div id={blog.id}>
-      <h2>{blog.title}</h2>
-      <p>{blog.url}</p>
-      <p>likes {blog.likes}</p>
-      {user ? <button onClick={handleLike}>like</button> : null}
-      <p>Added By {blog.user.name}</p>
-      {isOwner ? <button onClick={handleRemove}>remove</button> : null}
-    </div>
+    <Card id={blog.id}>
+      <CardContent sx={{ pb: 0 }}>
+        <Typography variant="h5" component="div">
+          {blog.title}
+        </Typography>
+        <Typography sx={{ color: 'text.secondary', mb: 1}}>
+          by {blog.author}
+        </Typography>
+        <Typography component="a" href={blog.url} sx={{ mb: 1, display: 'block' }}>
+          {blog.url}
+        </Typography>
+        <Typography sx={{ color: 'text.secondary' }}>
+          Added by {blog.user.name}
+        </Typography>
+      </CardContent>
+      <CardActions sx={{ pl: 2 }}>
+        <Typography>
+          {blog.likes} likes
+        </Typography>
+        {user ? <Button onClick={handleLike} variant="outlined">like</Button> : null}
+        {isOwner ? <Button onClick={handleRemove} variant="outlined" color="error">remove</Button> : null}
+      </CardActions>
+    </Card>
   )
 }
 
