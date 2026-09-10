@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Container } from '@mui/material'
+import { Container, AppBar, Toolbar, Button, Typography } from '@mui/material'
 
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import AddBlogForm from './components/AddBlogForm'
 import LoginForm from './components/LoginForm'
-import Togglable from './components/Togglable'
 import BlogList from './components/BlogList'
 
 import {
@@ -24,8 +22,7 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [message, setMessage] = useState(null)
-  const [isError, setIsError] = useState(false)
+  const [notification, setNotification] = useState(null)
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
@@ -63,19 +60,17 @@ const App = () => {
       setUser(loggedInUser)
       setUsername('')
       setPassword('')
-      setIsError(false)
-      setMessage(`succesfully logged in as ${username}`)
+      setNotification({ text: `Successfully logged in as ${username}!`, type: 'success' })
 
       setTimeout(() => {
-        setMessage(null)
+        setNotification(null)
       }, 5000)
       return true
     } catch {
-      setMessage('wrong credentials')
-      setIsError(true)
+      setNotification({ text: 'Wrong credentials!', type: 'error' })
 
       setTimeout(() => {
-        setMessage(null)
+        setNotification(null)
       }, 5000)
       return false
     }
@@ -90,10 +85,9 @@ const App = () => {
     setUsername('')
     setPassword('')
 
-    setMessage('succesfully logged out')
-    setIsError(false)
+    setNotification({ text: 'Successfully logged out!', type: 'success' })
     setTimeout(() => {
-      setMessage(null)
+      setNotification(null)
     }, 5000)
   }
 
@@ -112,29 +106,26 @@ const App = () => {
       const blogTitle = createdBlog.title || newBlog.title
       const blogAuthor = createdBlog.author || newBlog.author
 
-      setMessage(`a new blog ${blogTitle} by ${blogAuthor} added`)
-      setIsError(false)
+      setNotification({ text: `A new blog ${blogTitle} by ${blogAuthor} added!`, type: 'success'})
 
       setTimeout(() => {
-        setMessage(null)
+        setNotification(null)
       }, 5000)
     } catch {
-      setMessage('failed to add blog')
-      setIsError(true)
+      setNotification({ text: 'Failed to add blog', type: 'error' })
 
       setTimeout(() => {
-        setMessage(null)
+        setNotification(null)
       }, 5000)
     }
   }
 
   const updateBlog = async (newBlog, blogId) => {
     if (user === null) {
-      setMessage('user has to be logged in')
-      setIsError(true)
+      setNotification({ text: 'User has to be logged in!', type: 'error' })
 
       setTimeout(() => {
-        setMessage(null)
+        setNotification(null)
       }, 5000)
       return 
     }
@@ -150,22 +141,20 @@ const App = () => {
       const allBlogs = await blogService.getAll()
       setBlogs(allBlogs)
     } catch {
-      setMessage('failed to update blog')
-      setIsError(true)
+      setNotification({ text: 'Failed to update blog!', type: 'error' })
 
       setTimeout(() => {
-        setMessage(null)
+        setNotification(null)
       }, 5000)
     }
   }
 
   const removeBlog = async (blogId) => {
     if (user === null) {
-      setMessage('user has to be logged in')
-      setIsError(true)
+      setNotification({ text: 'User has to be logged in!', type: 'error' })
 
       setTimeout(() => {
-        setMessage(null)
+        setNotification(null)
       }, 5000)
       return 
     }
@@ -177,24 +166,26 @@ const App = () => {
       const allBlogs = await blogService.getAll()
       setBlogs(allBlogs)
 
-      setMessage(`${blogToDelete.title} by ${blogToDelete.author} blog has been sucessfully removed`)
-      setIsError(false)
+      setNotification({ text: `${blogToDelete.title} by ${blogToDelete.author} blog has been sucessfully removed!`, type: 'success'})
 
       setTimeout(() => {
-        setMessage(null)
+        setNotification(null)
       }, 5000)
     } catch {
-      setMessage('failed to delete blog')
-      setIsError(true)
+      setNotification({ text: 'Failed to delete blog!', type: 'error' })
 
       setTimeout(() => {
-        setMessage(null)
+        setNotification(null)
       }, 5000)
     }
   }
 
   const padding = {
     padding: 5
+  }
+
+  const margin = {
+    marginBottom: 10
   }
 
   // const visibleBlogs = [...blogs]
@@ -209,16 +200,37 @@ const App = () => {
   //   })
   //   .sort((a, b) => b.likes - a.likes)
 
+  const style = { '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' } }
+
   return (
     <Container>
       <Router>
-        <div>
-          <Link to='/' style={padding}>blogs</Link>
-          {user ? <Link to='create' style={padding}>new blog</Link> : null}
-          {user ?  <button style={padding} onClick={handleLogout}>logout</button> : <Link to='/login' style={padding}>login</Link>}
-        </div>
+        <AppBar position="static" style={margin}>
+          <Toolbar>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              Blog App
+            </Typography>
+            <Button color="inherit" component={Link} to="/" sx={style}>
+              blogs              
+            </Button>
+            {user ? 
+            <Button color="inherit" component={Link} to="/create" sx={style}>
+              new blog
+            </Button> : 
+            null
+            }
+            {user ?  
+            <Button color="inherit" style={padding} onClick={handleLogout} sx={style}>
+              logout
+            </Button> : 
+            <Button color="inherit" component={Link} to='/login' sx={style}>
+              login
+            </Button>
+            }
+          </Toolbar>
+        </AppBar>
 
-        <Notification message={message} isError={isError} />
+        <Notification notification={notification} />
 
         <Routes>
           <Route path='/blogs/:id' element={

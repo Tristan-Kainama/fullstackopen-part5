@@ -32,7 +32,7 @@ const Blog = ({ blogs, users, user, updateBlog, removeBlog }) => {
       return
     }
 
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
       removeBlog(blog.id)
       navigate('/')
     }
